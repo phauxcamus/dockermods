@@ -20,6 +20,6 @@ jobs:
       - name: Build and Push
         uses: docker/build-push-action@v6
         with:
-          context: ./${{ matrix.path }}
+          context: ${{ matrix.path }}
           push: true
-          tags: ghci.io/${{ github.repository }}:${{ matrix.path }}
+          tags: ghcr.io/${{ github.repository }}:${{ matrix.path }}
