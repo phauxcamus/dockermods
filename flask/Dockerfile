@@ -1,4 +1,5 @@
-# phauxcamus/dockermods:flask
+LABEL org.opencontainers.image.source=https://github.com/phauxcamus/dockermods
+
 FROM python:alpine
 
 WORKDIR /data
