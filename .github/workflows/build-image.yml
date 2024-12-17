@@ -12,8 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - path: flask
+        path: [flask]
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
