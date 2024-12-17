@@ -1,4 +1,4 @@
-LABEL org.opencontainers.image.source=https://github.com/phauxcamus/dockermods
+LABEL org.opencontainers.image.source="https://github.com/phauxcamus/dockermods"
 
 FROM python:alpine
 
