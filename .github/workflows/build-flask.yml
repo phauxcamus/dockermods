@@ -1,0 +1,32 @@
+name: Build Image
+on: 
+  push:
+    paths:
+      - 'flask/**'
+      - '!**.md'
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+      - name: Auth with registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and Push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./flask
+          push: true
+          tags: flask
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
