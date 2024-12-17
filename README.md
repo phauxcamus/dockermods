@@ -1,2 +1,1 @@
-# dockermods
-My little corner of Dockerfiles
+A collection of Dockerfiles I've built over time, maybe it'll be useful for someone else 😊
