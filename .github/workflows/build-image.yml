@@ -9,6 +9,8 @@ jobs:
         include:
           - path: flask
     steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
       - name: Auth with registry
         uses: docker/login-action@v3
         with:
