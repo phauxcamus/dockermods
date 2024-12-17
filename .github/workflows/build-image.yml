@@ -4,6 +4,9 @@ on:
     paths-ignore:
       - '.github/**'
       - '**.md'
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
 jobs:
   docker:
     runs-on: ubuntu-latest
