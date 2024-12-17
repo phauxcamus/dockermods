@@ -28,5 +28,3 @@ jobs:
           context: ./flask
           push: true
           tags: flask
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
