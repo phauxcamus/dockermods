@@ -10,4 +10,3 @@ ENV TZ America/Phoenix
 CMD [ "python", "app.py" ]
 
 LABEL org.opencontainers.image.source="https://github.com/phauxcamus/dockermods"
-#
