@@ -1,4 +1,4 @@
-name: papermc
+name: Papermc
 on: 
   push:
     paths:
