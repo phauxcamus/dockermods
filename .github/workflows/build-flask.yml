@@ -1,8 +1,10 @@
 name: Build Image
+env:
+  NAME: flask
 on: 
   push:
     paths:
-      - 'flask/**'
+      - '$NAME/**'
       - '!**.md'
 concurrency:
   group: ${{ github.workflow }}
@@ -25,6 +27,6 @@ jobs:
       - name: Build and Push
         uses: docker/build-push-action@v6
         with:
-          context: ./flask
+          context: ./$NAME
           push: true
-          tags: flask
+          tags: ghcr.io/${{ github.repository }}:$NAME
