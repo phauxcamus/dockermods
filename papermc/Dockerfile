@@ -6,12 +6,11 @@ WORKDIR /data
 RUN apk -q --no-cache --update add openjdk21-jre-headless wget jq
 
 RUN \
-    rm paper.jar;
     export PAPER_VERSION=$(wget -qO - "https://api.papermc.io/v2/projects/paper" |jq -r '.versions[-1]') \
     && export PAPER_BUILD=$(wget -qO - "https://api.papermc.io/v2/projects/paper/versions/$PAPER_VERSION" |jq -r '.builds[-1]') \
     && export PAPER_JARNAME=paper-$PAPER_VERSION-$PAPER_BUILD.jar \
     && wget -nc --progress=bar:force:noscroll -O $PAPER_JARNAME "https://api.papermc.io/v2/projects/paper/versions/$PAPER_VERSION/builds/$PAPER_BUILD/downloads/$PAPER_JARNAME" \
-    && ln -s $PAPER_JARNAME paper.jar
+    && ln -sf $PAPER_JARNAME paper.jar
 
 RUN apk -q del wget jq
 
