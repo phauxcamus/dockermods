@@ -1,0 +1,30 @@
+name: Nut
+on:
+  push:
+    paths:
+      - "nut/**"
+      - "!**.md"
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+      - name: Auth with registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and Push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./nut
+          push: true
+          tags: ghcr.io/${{ github.repository }}:nut
