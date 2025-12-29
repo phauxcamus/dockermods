@@ -1,0 +1,88 @@
+name: Build Images on Push
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect-changes: # Find changes to subfolders with Dockerfiles
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Find changed directories with Dockerfiles
+        id: set-matrix
+        run: |
+          # Find all directories with a Dockerfile
+          DOCKER_DIRS=$(find . -name Dockerfile -not -path "*/.*" -exec dirname {} \; | sed 's|^\./||' | sort -u)
+
+          # Get a list of changes in this push
+          if [ "${{ github.event.before }}" == "0000000000000000000000000000000000000000" ]; then
+            CHANGED_FILES=$(git ls-files)
+          else
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          fi
+
+          # Create a matrix of directories with Dockerfiles that are listed in the changes above
+          MATRIX_JSON="["
+          FIRST=1
+          for dir in $DOCKER_DIRS; do
+            # Check if any changed file starts with this directory path
+            if echo "$CHANGED_FILES" | grep -q "^$dir/"; then
+              echo ">> Change detected in: $dir"
+              if [ $FIRST -eq 0 ]; then MATRIX_JSON="$MATRIX_JSON,"; fi
+              MATRIX_JSON="$MATRIX_JSON\"$dir\""
+              FIRST=0
+            fi
+          done
+          MATRIX_JSON="$MATRIX_JSON]"
+
+          # Output result
+          echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
+
+  docker: # Build images based on the matrix from previous job
+    needs: detect-changes
+    # Only run if there's changes
+    if: ${{ needs.detect-changes.outputs.matrix != '[]' && needs.detect-changes.outputs.matrix != '' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        # Parse incoming matrix data
+        folder: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+      - name: Auth with registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate Tag Name
+        id: tag
+        run: |
+          # Clean up tag
+          SAFE_TAG=$(echo "${{ matrix.folder }}" | tr '/' '-')
+          echo "name=$SAFE_TAG" >> $GITHUB_OUTPUT
+      - name: Build and Push (${{ matrix.folder }})
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.folder }}
+          push: true
+          # Use folder name for image tag
+          tags: ghcr.io/${{ github.repository }}:${{ steps.tag.outputs.name }}
