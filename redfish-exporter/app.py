@@ -7,6 +7,14 @@ from os import getenv
 from dotenv import load_dotenv
 load_dotenv()
 
+# Control-C Handling
+import signal
+import sys
+def signal_handler(sig, frame):
+    print('Quitting')
+    sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler)
+
 # Setup
 app = Flask(__name__)
 PROM_NAMESPACE = getenv('PROM_NAMESPACE', 'redfish')
