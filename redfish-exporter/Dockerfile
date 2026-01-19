@@ -3,7 +3,7 @@ FROM python:alpine
 WORKDIR /data
 COPY . .
 
-RUN python -m pip --root-user-action install --upgrade pip
+RUN python -m pip install --upgrade pip
 RUN pip --root-user-action install --no-cache-dir -r requirements.txt
 
 CMD [ "python", "app.py" ]
