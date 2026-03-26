@@ -3,7 +3,7 @@ FROM python:alpine
 WORKDIR /data
 
 RUN python -m pip install --upgrade pip && \
-	pip install --no-cache-dir flask requests feedgen bs4
+	pip install --no-cache-dir flask requests feedgen bs4 pysocks
 
 ENV TZ America/Phoenix
 
