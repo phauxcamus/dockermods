@@ -3,7 +3,7 @@ FROM alpine:latest
 VOLUME /data
 WORKDIR /data
 
-RUN apk -q --no-cache --update add openjdk21-jre-headless wget jq
+RUN apk -q --no-cache --update add openjdk25-jre-headless wget jq
 
 RUN \
     export PAPER_VERSION=$(wget -qO - "https://api.papermc.io/v2/projects/paper" |jq -r '.versions[-1]') \
